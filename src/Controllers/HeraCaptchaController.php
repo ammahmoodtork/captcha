@@ -1,8 +1,8 @@
 <?php
 
-namespace Hera\HeraCaptcha\Controllers;
+namespace Hera\Captcha\Controllers;
 
-use Hera\HeraCaptcha\HeraCaptcha;
+use Hera\Captcha\HeraCaptcha;
 
 class HeraCaptchaController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hera\HeraCaptcha\Providers;
+namespace Hera\Captcha\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

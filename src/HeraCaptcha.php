@@ -1,6 +1,6 @@
 <?php
 
-namespace Hera\HeraCaptcha;
+namespace Hera\Captcha;
 
 class HeraCaptcha
 {

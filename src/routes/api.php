@@ -1,6 +1,6 @@
 <?php
 
-use Hera\HeraCaptcha\Controllers\HeraCaptchaController;
+use Hera\Captcha\Controllers\HeraCaptchaController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group(function () {
