@@ -9,15 +9,21 @@ class HeraCaptcha
         $config = config('captcha.' . $conf);
 
         // $img = imagecreate(120, 36);
-        $photoAddress = (__DIR__ . "/assets/backgrounds/01.png");
-        $img = imagecreatefrompng($photoAddress);
+        try {
+            $photoAddress = (__DIR__ . "/assets/backgrounds/01.png");
+            $img = imagecreatefrompng($photoAddress);
+        } catch (\Throwable $th) {
+            $img = imagecreate(120, 50);
+            $textbgcolor = imagecolorallocate($img, 255, 255, 255);
+        }
+
         $textbgcolor = imagecolorallocate($img, 255, 255, 255);
         $char = $this->getText();
         $txt = '';
         for ($i = 0; $i < count($char); $i++) {
             $color = $this->getfontColors();
             $textcolor = imagecolorallocate($img, $color[0], $color[1], $color[2]);
-            imagettftext($img, 20, rand(-40 , 40), ($i * (120 / $config['length'])) + 5, 28, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $char[$i]);
+            imagettftext($img, 20, rand(-40, 40), ($i * (120 / $config['length'])) + 5, 28, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $char[$i]);
             $txt .= $char[$i];
         }
         // imagettftext($img, 20, 0, 5, 28, $textcolor, (__DIR__ . "/assets/IRANSansWeb.ttf"), $txt);
