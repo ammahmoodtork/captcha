@@ -1,0 +1,16 @@
+{
+    "name": "hera/captcha",
+    "description": "remove robots attack by captcha",
+    "autoload": {
+        "psr-4": {
+            "Hera\\Captcha\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Amir Mahmoodtork",
+            "email": "ammahmoodtork@gmail.com"
+        }
+    ],
+    "require": {}
+}
