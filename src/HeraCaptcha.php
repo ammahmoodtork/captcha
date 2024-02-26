@@ -2,6 +2,8 @@
 
 namespace Hera\Captcha;
 
+use Illuminate\Support\Facades\Hash;
+
 class HeraCaptcha
 {
     public function generate($conf = 'default')
@@ -31,7 +33,7 @@ class HeraCaptcha
         imagepng($img);
         return [
             "img" => "data:image/png;base64," . base64_encode(ob_get_clean()),
-            "key" => bcrypt($txt)
+            "key" => Hash::make($txt)
         ];
     }
 
