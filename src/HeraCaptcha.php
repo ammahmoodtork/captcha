@@ -56,4 +56,9 @@ class HeraCaptcha
         $color = sscanf($hex, "#%02x%02x%02x");
         return $color;
     }
+
+    public static function checkCaptcha($captcha, $key, $config)
+    {
+        return Hash::check($captcha, $key);
+    }
 }
