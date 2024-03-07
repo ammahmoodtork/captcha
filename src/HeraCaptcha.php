@@ -57,7 +57,7 @@ class HeraCaptcha
         return $color;
     }
 
-    public static function checkCaptcha($captcha, $key, $config)
+    public function checkCaptcha($captcha, $key, $config)
     {
         return Hash::check($captcha, $key);
     }
