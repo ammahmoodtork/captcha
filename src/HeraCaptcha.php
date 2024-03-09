@@ -40,7 +40,6 @@ class HeraCaptcha
     private function getBackgroudImage()
     {
         $name = str_pad(rand(1, 12), 2, "0", STR_PAD_LEFT);
-        // dd((__DIR__ . "/assets/backgrounds/{$name}.png"));
         return (__DIR__ . "/assets/backgrounds/{$name}.png");
     }
 
