@@ -6,27 +6,48 @@ use Illuminate\Support\Facades\Hash;
 
 class HeraCaptcha
 {
+
+    /**
+     * language characters can be fa for Persian, ar for Arabic anddefault is en for English
+     */
+    private $numbersLangs = 'en';
+
+    private $length = 5;
+    private $width = 120;
+    private $height = 50;
+    private $bgColor = "#ecf2f4";
+    private $fontColors = ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
+
+    private function setConfig($config)
+    {
+        $this->length = $config['length'] ? $config['length'] : 5;
+        $this->width = $config['width'] ? $config['width'] : 120;
+        $this->height = $config['height'] ? $config['height'] : 50;
+        $this->bgColor = $config['bgColor'] ? $config['bgColor'] : "#ecf2f4";
+        $this->fontColors = $config['fontColors'] ? $config['fontColors'] : ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
+    }
+
     public function generate($conf = 'default')
     {
         $config = config('captcha.' . $conf);
-
-        // $img = imagecreate(120, 36);
+        $this->setConfig($config);
         try {
             $photoAddress = $this->getBackgroudImage();
             $img = imagecreatefrompng($photoAddress);
+            imagecopyresized($img, $img, 0, 0, 0, 0, $this->width, $this->height, 135, 47);
         } catch (\Throwable $th) {
-            $img = imagecreate(120, 50);
+            $img = imagecreate($this->width, $this->height);
             $textbgcolor = imagecolorallocate($img, 255, 255, 255);
         }
 
-        $textbgcolor = imagecolorallocate($img, 255, 255, 255);
+        //$textbgcolor = imagecolorallocate($img, 255, 255, 255);
         $char = $this->getText();
         $txt = '';
         for ($i = 0; $i < count($char); $i++) {
             $color = $this->getfontColors();
             $textcolor = imagecolorallocate($img, $color[0], $color[1], $color[2]);
-            imagettftext($img, 20, rand(-40, 40), ($i * (120 / $config['length'])) + 5, 28, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $char[$i]);
-            $txt .= $this->getchar($char[$i], $conf);
+            imagettftext($img, 20, rand(-40, 40), ($i * (120 / $this->length)) + 5, 28, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $this->getchar($char[$i]));
+            $txt .= $char[$i];
         }
         // imagettftext($img, 20, 0, 5, 28, $textcolor, (__DIR__ . "/assets/IRANSansWeb.ttf"), $txt);
         ob_start();
@@ -48,22 +69,36 @@ class HeraCaptcha
         $characters = config('captcha.characters');
         $config = config('captcha.' . $conf);
         $textArray = [];
-        for ($i = 0; $i < $config['length']; $i++) {
+        for ($i = 0; $i < $this->length; $i++) {
             $textArray[] = $characters[rand(0, count($characters) - 1)];
         }
         return $textArray;
     }
 
-    private function getchar($char, $conf)
+    private function getchar($char)
     {
-        return $char;
-        dd(mb_convert_encoding(chr(ord('0') + 171), "UTF-8"), ord('۰'));
+        // return $char;
+        if ($this->numbersLangs == 'en')
+            return $char;
+        $numbers = [
+            '1' => '۱',
+            '2' => '۲',
+            '3' => '۳',
+            '4' => '۴',
+            '5' => '۵',
+            '6' => '۶',
+            '7' => '۷',
+            '8' => '۸',
+            '9' => '۹',
+            '0' => '۰',
+        ];
+        return $numbers[$char];
     }
 
     private function getfontColors($conf = 'default')
     {
         // $colors = config('captcha.fontColors');
-        $colors = config('captcha.' . $conf)['fontColors'];
+        $colors = $this->fontColors;
         $hex = $colors[rand(0, count($colors) - 1)];
         $color = sscanf($hex, "#%02x%02x%02x");
         return $color;
