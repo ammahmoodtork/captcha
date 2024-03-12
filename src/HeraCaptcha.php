@@ -2,6 +2,7 @@
 
 namespace Hera\Captcha;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class HeraCaptcha
@@ -17,7 +18,7 @@ class HeraCaptcha
     private $height = 50;
     private $bgColor;
     private $fontColors = ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
-
+    private $expire = 60;
     private function setConfig($config)
     {
         $this->numbersLangs = $config['numbersLangs'] ? $config['numbersLangs'] : "eb";
@@ -26,6 +27,7 @@ class HeraCaptcha
         $this->height = $config['height'] ? $config['height'] : 50;
         $this->bgColor = $config['bgColor'] ? sscanf($config['bgColor'], "#%02x%02x%02x") : sscanf("#ecf2f4", "#%02x%02x%02x");
         $this->fontColors = $config['fontColors'] ? $config['fontColors'] : ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
+        $this->expire = $config['expire'] ? $config['expire'] : 60;
     }
 
     public function generate($conf = 'default')
@@ -53,10 +55,21 @@ class HeraCaptcha
         // imagettftext($img, 20, 0, 5, 28, $textcolor, (__DIR__ . "/assets/IRANSansWeb.ttf"), $txt);
         ob_start();
         imagepng($img);
+        $key = Hash::make($txt);
+        $this->setCacheKey($key);
         return [
             "img" => "data:image/png;base64," . base64_encode(ob_get_clean()),
-            "key" => Hash::make($txt)
+            "key" => $key
         ];
+    }
+
+    private function setCacheKey($key)
+    {
+        Cache::add('captchaCache_' . $key, $key, $this->expire);
+    }
+    private function getCachedKey($key)
+    {
+        return Cache::get('captchaCache_' . $key, null);
     }
 
     private function getBackgroudImage()
@@ -93,7 +106,7 @@ class HeraCaptcha
             '9' => '۹',
             '0' => '۰',
         ];
-        return $numbers[$char];
+        return empty($numbers[$char]) ? $char : $numbers[$char];
     }
 
     private function getfontColors($conf = 'default')
@@ -107,6 +120,9 @@ class HeraCaptcha
 
     public function checkCaptcha($captcha, $key, $config)
     {
+        if (!$this->getCachedKey($key)) {
+            return false;
+        }
         return Hash::check($captcha, $key);
     }
 }
