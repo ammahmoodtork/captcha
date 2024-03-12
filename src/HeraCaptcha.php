@@ -81,7 +81,6 @@ class HeraCaptcha
     private function getText($conf = 'default')
     {
         $characters = config('captcha.characters');
-        $config = config('captcha.' . $conf);
         $textArray = [];
         for ($i = 0; $i < $this->length; $i++) {
             $textArray[] = $characters[rand(0, count($characters) - 1)];
