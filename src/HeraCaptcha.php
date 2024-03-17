@@ -21,13 +21,13 @@ class HeraCaptcha
     private $expire = 60;
     private function setConfig($config)
     {
-        $this->numbersLangs = $config['numbersLangs'] ? $config['numbersLangs'] : "eb";
-        $this->length = $config['length'] ? $config['length'] : 5;
-        $this->width = $config['width'] ? $config['width'] : 120;
-        $this->height = $config['height'] ? $config['height'] : 50;
-        $this->bgColor = $config['bgColor'] ? sscanf($config['bgColor'], "#%02x%02x%02x") : sscanf("#ecf2f4", "#%02x%02x%02x");
-        $this->fontColors = $config['fontColors'] ? $config['fontColors'] : ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
-        $this->expire = $config['expire'] ? $config['expire'] : 60;
+        $this->numbersLangs = isset($config['numbersLangs']) ? $config['numbersLangs'] : "eb";
+        $this->length = isset($config['length']) ? $config['length'] : 5;
+        $this->width = isset($config['width']) ? $config['width'] : 120;
+        $this->height = isset($config['height']) ? $config['height'] : 50;
+        $this->bgColor = isset($config['bgColor']) ? sscanf($config['bgColor'], "#%02x%02x%02x") : sscanf("#ecf2f4", "#%02x%02x%02x");
+        $this->fontColors = isset($config['fontColors']) ? $config['fontColors'] : ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'];
+        $this->expire = isset($config['expire']) ? $config['expire'] : 60;
     }
 
     public function generate($conf = 'default')
@@ -37,22 +37,19 @@ class HeraCaptcha
         try {
             $photoAddress = $this->getBackgroudImage();
             $img = imagecreatefrompng($photoAddress);
-            imagecopyresized($img, $img, 0, 0, 0, 0, $this->width, $this->height, 135, 47);
+            imagecopyresized($img, $img, 0, 0, 0, 0, $this->width, $this->height, $this->width, $this->height);
         } catch (\Throwable $th) {
             $img = imagecreate($this->width, $this->height);
             $textbgcolor = imagecolorallocate($img, $this->bgColor[0], $this->bgColor[1], $this->bgColor[2]);
         }
-
-        //$textbgcolor = imagecolorallocate($img, 255, 255, 255);
         $char = $this->getText();
         $txt = '';
         for ($i = 0; $i < count($char); $i++) {
             $color = $this->getfontColors();
             $textcolor = imagecolorallocate($img, $color[0], $color[1], $color[2]);
-            imagettftext($img, 20, rand(-40, 40), ($i * (120 / $this->length)) + 5, 28, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $this->getchar($char[$i]));
+            imagettftext($img, 20, rand(-40, 40), ($i * ($this->width / $this->length)) + 5, $this->height * 0.8, $textcolor, (__DIR__ . "/assets/fonts/IRANSansWeb.ttf"), $this->getchar($char[$i]));
             $txt .= $char[$i];
         }
-        // imagettftext($img, 20, 0, 5, 28, $textcolor, (__DIR__ . "/assets/IRANSansWeb.ttf"), $txt);
         ob_start();
         imagepng($img);
         $key = Hash::make($txt);
