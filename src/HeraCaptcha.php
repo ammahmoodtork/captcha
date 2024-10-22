@@ -62,7 +62,10 @@ class HeraCaptcha
 
     private function setCacheKey($key)
     {
-        Cache::add('captchaCache_' . $key, $key, $this->expire);
+        //Cache::add('captchaCache_' . $key, $key, $this->expire);
+        $cache = Cache::remember('captchaCache_' . $key, 60, function () use ($key) {
+            return $key;
+        });
     }
     private function getCachedKey($key)
     {
