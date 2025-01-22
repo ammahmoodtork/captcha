@@ -69,7 +69,11 @@ class HeraCaptcha
     }
     private function getCachedKey($key)
     {
-        return Cache::get('captchaCache_' . $key, null);
+        $captchaCache = Cache::get('captchaCache_' . $key, null);
+        if ($captchaCache) {
+            Cache::delete('captchaCache_' . $key);
+        }
+        return $captchaCache;
     }
 
     private function getBackgroudImage()
